@@ -39,12 +39,19 @@ class PolynomialRegressionModel(Model):
 
     def __init__(self, degree = 1, learning_rate = 1e-3):
         "*** YOUR CODE HERE ***"
+        self.degree = degree
+        self.learning_rate = learning_rate
+        self.weights = np.array(degree+1) # array of degrees, dummy feature w/ value of 1
  
     def get_features(self, x):
         "*** YOUR CODE HERE ***"
+        # x^degree for each degree 
+        features = [x ** degree for degree in (self.degree+1)] # +1 dummy value
+        return np.array(features)  
 
     def get_weights(self):
         "*** YOUR CODE HERE ***"
+        return self.weights
 
     def hypothesis(self, x):
         "*** YOUR CODE HERE ***"
