@@ -55,20 +55,30 @@ class PolynomialRegressionModel(Model):
 
     def hypothesis(self, x):
         "*** YOUR CODE HERE ***"
+        features = self.get_features(x) # get list of features 
+        weights = self.get_weights() # get list of weights  
+        hypothesis = np.sum(features*weights)
+        return hypothesis
 
     def predict(self, x):
         return self.hypothesis(x)
 
     def loss(self, x, y):
         "*** YOUR CODE HERE ***"
+        pred = self.predict(x)
+        loss = np.sum(pred-y)**2
+        return loss
 
     def gradient(self, x, y):
         "*** YOUR CODE HERE ***"
+        pred = self.predict(x)
+        return 2*(pred-y)*self.get_features(x)
+        
 
     def train(self, dataset, evalset = None):
         "*** YOUR CODE HERE ***"
-
-
+ 
+   
 # PA4 Q2
 def linear_regression():
     "*** YOUR CODE HERE ***"
