@@ -41,12 +41,12 @@ class PolynomialRegressionModel(Model):
         "*** YOUR CODE HERE ***"
         self.degree = degree
         self.learning_rate = learning_rate
-        self.weights = np.array(degree+1) # curr params, dummy feature w/ value of 1
+        self.weights = 0
  
     def get_features(self, x):
         "*** YOUR CODE HERE ***"
         # x^degree for each degree 
-        features = [x ** degree for degree in (self.degree+1)] # +1 dummy value
+        features = [x ** degree for degree in range(self.degree+1)] # +1 dummy value
         return features 
 
     def get_weights(self):
@@ -66,19 +66,33 @@ class PolynomialRegressionModel(Model):
     def loss(self, x, y):
         "*** YOUR CODE HERE ***"
         pred = self.predict(x)
-        loss = np.sum(pred-y)**2
+        error = pred - y
+        loss = np.sum(error**2)
         return loss
 
     def gradient(self, x, y):
         "*** YOUR CODE HERE ***"
         pred = self.predict(x)
-        return 2*(pred-y)*self.get_features(x)
-        
+        error = pred - y
+        features = self.get_features(x)
+        gradient = np.sum(2*(error)*features) ## 
+        return gradient
 
-    def train(self, dataset, evalset = None):
+    def train(self, dataset, evalset = None): # ignore evalset
         "*** YOUR CODE HERE ***"
- 
-   
+        np.random.seed(2) 
+        
+        self.weights = np.random.randn(self.degree+1)
+        
+        for iteration in range(1000):
+            k = 0
+            for x, y in dataset: # pick random sample
+                grad = self.gradient(x,y)
+                self.weights -= self.learning_rate*grad
+                k += self.loss(x,y)
+        
+        return k # or return average loss
+    
 # PA4 Q2
 def linear_regression():
     "*** YOUR CODE HERE ***"
