@@ -3,10 +3,6 @@ import matplotlib.pyplot as plt
 import math
 import util
 
-# delete pls 
-from sklearn.linear_model import LinearRegression
-import seaborn as sns
-
 class Model:
     """
     Abstract class for a machine learning model.
@@ -59,10 +55,7 @@ class PolynomialRegressionModel(Model):
 
     def hypothesis(self, x): # fix 
         "*** YOUR CODE HERE ***"
-        features = self.get_features(x) # get list of features 
-        weights = self.get_weights() # get list of weights  
-        hypothesis = np.sum(features*weights)
-        return hypothesis
+        return np.dot(self.get_features(x), self.weights)
 
     def predict(self, x):
         return self.hypothesis(x)
@@ -94,8 +87,8 @@ class PolynomialRegressionModel(Model):
                 grad = self.gradient(x,y)
                 self.weights -= self.learning_rate*grad
                 
-                if evalset is not None and iteration % evalset == 0: # 
-                    losses.append(dataset.compute_average_loss())   
+                if evalset is not None and iteration % evalset == 0: 
+                    losses.append(dataset.compute_average_loss(self))   
         
         return losses
             
@@ -107,7 +100,7 @@ def linear_regression():
      
     sine_train = util.get_dataset("sine_train") # load data
     sine_model = PolynomialRegressionModel(degree=1, learning_rate=1e-4) # model
-    sine_model.train(sine_train)
+    losses = sine_model.train(sine_train, 100)
     
     # final hypothesis
     hypothesis = sine_model.get_weights()
@@ -121,9 +114,8 @@ def linear_regression():
     sine_train.plot_data(sine_model)
     
     # plot loss
-    losses = sine_model.train(sine_train, 100)
     title = "Loss Curve"
-    sine_train.plot_loss_curve(100, losses, title)
+    sine_train.plot_loss_curve(np.arange(len(losses)), losses, title)
 
 
 # PA4 Q3
