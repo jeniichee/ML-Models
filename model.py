@@ -79,20 +79,26 @@ class PolynomialRegressionModel(Model):
         pred = self.predict(x)
         error = pred - y
         features = self.get_features(x)
-        gradient = np.sum(2*(error)*np.array(features)) ##fix 
+        gradient = np.sum(2*(error)*np.array(features)) # doubt
         return gradient
 
-    def train(self, dataset, evalset = None): # ignore evalset
+    def train(self, dataset, evalset = None):
         "*** YOUR CODE HERE ***"
         np.random.seed(2) 
         self.weights = np.random.randn(self.degree+1)
         xs, ys = dataset.get_all_samples()
+        losses = []
                
         for iteration in range(1000):
             for x, y in zip(xs, ys): 
                 grad = self.gradient(x,y)
                 self.weights -= self.learning_rate*grad
-    
+                
+                if evalset is not None and iteration % evalset == 0: # 
+                    losses.append(dataset.compute_average_loss())   
+        
+        return losses
+            
 # PA4 Q2
 def linear_regression():
     "*** YOUR CODE HERE ***"
@@ -101,7 +107,7 @@ def linear_regression():
      
     sine_train = util.get_dataset("sine_train") # load data
     sine_model = PolynomialRegressionModel(degree=1, learning_rate=1e-4) # model
-    sine_model.train(sine_train) # train 
+    sine_model.train(sine_train)
     
     # final hypothesis
     hypothesis = sine_model.get_weights()
@@ -111,8 +117,13 @@ def linear_regression():
     avg_loss = sine_train.compute_average_loss(sine_model)
     print("average loss:" + str(avg_loss))
     
-    # plot 
+    # plot hypothesis
     sine_train.plot_data(sine_model)
+    
+    # plot loss
+    losses = sine_model.train(sine_train, 100)
+    title = "Loss Curve"
+    sine_train.plot_loss_curve(100, losses, title)
 
 
 # PA4 Q3
