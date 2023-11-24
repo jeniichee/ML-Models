@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import math
 import util
 
+# delete pls 
+from sklearn.linear_model import LinearRegression
+import seaborn as sns
+
 class Model:
     """
     Abstract class for a machine learning model.
@@ -41,7 +45,7 @@ class PolynomialRegressionModel(Model):
         "*** YOUR CODE HERE ***"
         self.degree = degree
         self.learning_rate = learning_rate
-        self.weights = 0
+        self.weights = np.zeros(degree+1)
  
     def get_features(self, x):
         "*** YOUR CODE HERE ***"
@@ -53,7 +57,7 @@ class PolynomialRegressionModel(Model):
         "*** YOUR CODE HERE ***"
         return self.weights
 
-    def hypothesis(self, x):
+    def hypothesis(self, x): # fix 
         "*** YOUR CODE HERE ***"
         features = self.get_features(x) # get list of features 
         weights = self.get_weights() # get list of weights  
@@ -75,32 +79,40 @@ class PolynomialRegressionModel(Model):
         pred = self.predict(x)
         error = pred - y
         features = self.get_features(x)
-        gradient = np.sum(2*(error)*features) ## 
+        gradient = np.sum(2*(error)*np.array(features)) ##fix 
         return gradient
 
     def train(self, dataset, evalset = None): # ignore evalset
         "*** YOUR CODE HERE ***"
         np.random.seed(2) 
-        
         self.weights = np.random.randn(self.degree+1)
-        
+        xs, ys = dataset.get_all_samples()
+               
         for iteration in range(1000):
-            k = 0
-            for x, y in dataset: # pick random sample
+            for x, y in zip(xs, ys): 
                 grad = self.gradient(x,y)
                 self.weights -= self.learning_rate*grad
-                k += self.loss(x,y)
-        
-        return k # or return average loss
     
 # PA4 Q2
 def linear_regression():
     "*** YOUR CODE HERE ***"
     # Examples
-    # sine_train = util.get_dataset("sine_train")
     # sine_val = util.get_dataset("sine_val")
-    # sine_model = PolynomialRegressionModel()
-    # sine_model.train(sine_train)
+     
+    sine_train = util.get_dataset("sine_train") # load data
+    sine_model = PolynomialRegressionModel(degree=1, learning_rate=1e-4) # model
+    sine_model.train(sine_train) # train 
+    
+    # final hypothesis
+    hypothesis = sine_model.get_weights()
+    print("final hypothesis:" + str(hypothesis))
+    
+    # average loss 
+    avg_loss = sine_train.compute_average_loss(sine_model)
+    print("average loss:" + str(avg_loss))
+    
+    # plot 
+    sine_train.plot_data(sine_model)
 
 
 # PA4 Q3
