@@ -38,37 +38,31 @@ class PolynomialRegressionModel(Model):
     """
 
     def __init__(self, degree = 1, learning_rate = 1e-3):
-        "*** YOUR CODE HERE ***"
         self.degree = degree
         self.learning_rate = learning_rate
         self.weights = np.zeros(degree+1)
  
     def get_features(self, x):
-        "*** YOUR CODE HERE ***"
         # x^degree for each degree 
         features = [x ** degree for degree in range(self.degree+1)] # +1 dummy value
         return features 
 
     def get_weights(self):
-        "*** YOUR CODE HERE ***"
         return self.weights
 
     def hypothesis(self, x): # fix 
-        "*** YOUR CODE HERE ***"
         return np.dot(self.get_features(x), self.weights)
 
     def predict(self, x):
         return self.hypothesis(x)
 
     def loss(self, x, y):
-        "*** YOUR CODE HERE ***"
         pred = self.predict(x)
         error = pred - y
         loss = np.sum(error**2)
         return loss
 
     def gradient(self, x, y):
-        "*** YOUR CODE HERE ***"
         pred = self.predict(x)
         error = pred - y
         features = self.get_features(x)
@@ -76,7 +70,6 @@ class PolynomialRegressionModel(Model):
         return gradient
 
     def train(self, dataset, evalset = None):
-        "*** YOUR CODE HERE ***"
         np.random.seed(2) 
         self.weights = np.random.randn(self.degree+1)
         xs, ys = dataset.get_all_samples()
@@ -94,11 +87,7 @@ class PolynomialRegressionModel(Model):
             
 # PA4 Q2
 def linear_regression():
-    "*** YOUR CODE HERE ***"
-    # Examples
-    # sine_val = util.get_dataset("sine_val")
-     
-    sine_train = util.get_dataset("sine_train") # load data
+    sine_train = util.get_dataset("sine_train") # load training data
     sine_model = PolynomialRegressionModel(degree=1, learning_rate=1e-4) # model
     losses = sine_model.train(sine_train, 100)
     
@@ -116,7 +105,34 @@ def linear_regression():
     # plot loss
     title = "Loss Curve"
     sine_train.plot_loss_curve(np.arange(len(losses)), losses, title)
+    
+    # hyperparameter search
+    sine_val = util.get_dataset("sine_val") # load validation data
+    degrees = [1, 2, 3, 4, 5]
+    lrs = [1e-1, 1e-2, 1e-3, 1e-4, 1e-5]
+    
+    best_combo = None
+    least_avg_val_loss = float('inf')
+    
+    for degree in degrees: 
+        for lr in lrs: 
+            # liner regression on training dataset
+            sine_model1 = PolynomialRegressionModel(degree=degree, learning_rate=lr) 
+            # losses = sine_model.train(sine_train, 100)
+            avg_loss_train = sine_train.compute_average_loss(sine_model1) # training set loss
+            avg_val_loss = sine_val.compute_average_loss(sine_model1) # validation set loss
 
+            print(f"degree: {degree}, rate: {lr}")
+            print(f"average training set loss: {avg_loss_train}")
+            print(f"average validation set loss: {avg_val_loss}\n")
+
+            if avg_val_loss < least_avg_val_loss:
+                least_avg_val_loss = avg_val_loss
+                best_combo = (degree, lr)
+
+    print("best combo:")
+    print(f"degree: {best_combo[0]}, learning rate: {best_combo[1]}")
+    print(f"lowest average validation loss: {least_avg_val_loss}")
 
 # PA4 Q3
 class BinaryLogisticRegressionModel(Model):
@@ -127,33 +143,33 @@ class BinaryLogisticRegressionModel(Model):
     """
 
     def __init__(self, num_features, learning_rate = 1e-2):
-        "*** YOUR CODE HERE ***"
+        return
 
     def get_features(self, x):
-        "*** YOUR CODE HERE ***"
+        return
 
     def get_weights(self):
-        "*** YOUR CODE HERE ***"
+        return
 
     def hypothesis(self, x):
-        "*** YOUR CODE HERE ***"
+        return
 
     def predict(self, x):
-        "*** YOUR CODE HERE ***"
+        return
 
     def loss(self, x, y):
-        "*** YOUR CODE HERE ***"
+        return
 
     def gradient(self, x, y):
-        "*** YOUR CODE HERE ***"
+        return
 
     def train(self, dataset, evalset = None):
-        "*** YOUR CODE HERE ***"
+        return
 
 
 # PA4 Q4
 def binary_classification():
-    "*** YOUR CODE HERE ***"
+    return
 
 
 # PA4 Q5
@@ -166,33 +182,33 @@ class MultiLogisticRegressionModel(Model):
     """
 
     def __init__(self, num_features, num_classes, learning_rate = 1e-2):
-        "*** YOUR CODE HERE ***"
+        return
 
     def get_features(self, x):
-        "*** YOUR CODE HERE ***"
+        return
 
     def get_weights(self):
-        "*** YOUR CODE HERE ***"
+        return
 
     def hypothesis(self, x):
-        "*** YOUR CODE HERE ***"
+        return
 
     def predict(self, x):
-        "*** YOUR CODE HERE ***"
+        return
 
     def loss(self, x, y):
-        "*** YOUR CODE HERE ***"
+        return
 
     def gradient(self, x, y):
-        "*** YOUR CODE HERE ***"
+        return
 
     def train(self, dataset, evalset = None):
-        "*** YOUR CODE HERE ***"
+        return
 
 
 # PA4 Q6
 def multi_classification():
-    "*** YOUR CODE HERE ***"
+    return
 
 
 def main():
