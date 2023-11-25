@@ -143,34 +143,63 @@ class BinaryLogisticRegressionModel(Model):
     """
 
     def __init__(self, num_features, learning_rate = 1e-2):
-        return
-
+        self.num_features = num_features
+        self.learning_rate = learning_rate
+        self.weights = np.zeros(num_features+1) # dummy bias >:o
+    
     def get_features(self, x):
-        return
+        # x is 2D, return 1D 
+        features = []
+        for row in x: 
+            for pixel in row: 
+                features.append(pixel)
+        
+        return features 
 
     def get_weights(self):
-        return
+        return self.get_weights()
 
     def hypothesis(self, x):
-        return
+        z = (np.dot(self.get_features(x), self.get_weights()))
+        return 1/(1+math.e**(-z)) # sigmoid
 
     def predict(self, x):
-        return
+        if self.hypothesis(x)>= 0.5:
+            return 1 
+        else:
+            return 0 
 
     def loss(self, x, y):
-        return
+        hx = self.hypothesis(x)
+        return (-y*np.log(hx)-(1-y)*np.log(1-hx))
 
     def gradient(self, x, y):
-        return
+        # list of partial derivatives of the loss function with respect to each weight.
+        hx = self.hypothesis(x) 
+        features = self.get_features(x)       
+        return (hx-y)*np.array(features) 
 
     def train(self, dataset, evalset = None):
-        return
+        np.random.seed(2) 
+        self.weights = np.random.randn(self.num_features+1)
+        avg_loss = None
+        
+        for iteration in range(100000):
+            total = np.zeros(self.num_features + 1)
+            for x, y in dataset:
+                grad = self.gradient(x, y)
+                total += grad
 
+            # update weights
+            self.weights -= self.learning_rate * total / len(dataset)
+
+            if evalset is not None and iteration % evalset == 0:
+                avg_loss = np.mean([self.loss(x, y) for x, y in evalset])
+                print(f"iteration {iteration}, average loss: {avg_loss}")
 
 # PA4 Q4
 def binary_classification():
     return
-
 
 # PA4 Q5
 class MultiLogisticRegressionModel(Model):
