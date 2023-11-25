@@ -29,7 +29,6 @@ class Model:
     def train(self, dataset):
         pass
 
-
 # PA4 Q1
 class PolynomialRegressionModel(Model):
     """
@@ -211,29 +210,63 @@ class MultiLogisticRegressionModel(Model):
     """
 
     def __init__(self, num_features, num_classes, learning_rate = 1e-2):
-        return
+        self.num_features = num_features
+        self.learning_rate = learning_rate
+        self.num_classes = num_classes
+        self.weights = np.zeros((num_classes, num_features+1)) 
 
     def get_features(self, x):
-        return
+        features = []
+        for row in x: 
+            for pixel in row: 
+                features.append(pixel)
+        
+        return features 
 
     def get_weights(self):
-        return
+        self.get_weights()
 
     def hypothesis(self, x):
-        return
+        features = self.get_features(x)
+        weights = self.weights.T
+        z = np.dot(features, weights)  # Transpose for matrix multiplication
+        probabilities = np.exp(z) / np.exp(z).sum(axis=1, keepdims=True)
+        return probabilities.tolist()
 
     def predict(self, x):
-        return
+        return np.argmax(self.hypothesis(x))+1
 
     def loss(self, x, y):
-        return
+        probabilities = self.hypothesis(x)
+        return -math.log(probabilities[y - 1]) 
 
     def gradient(self, x, y):
-        return
+        probabilities = self.hypothesis(x)
+        features = self.get_features(x)
+        gradient = np.zeros_like(self.weights)
+
+        for k in range(self.num_classes):
+            gradient[k] = (probabilities[k] - (k + 1 == y)) * np.array(features)
+
+        return gradient
 
     def train(self, dataset, evalset = None):
-        return
+        np.random.seed(2)
+        self.weights = np.random.randn(self.num_classes, self.num_features + 1)
 
+        for iteration in range(100000):
+            total_gradient = np.zeros_like(self.weights)
+
+            for x, y in dataset:
+                grad = self.gradient(x, y)
+                total_gradient += grad
+
+            # update weights 
+            self.weights -= self.learning_rate * total_gradient / len(dataset)
+
+            if evalset is not None and iteration % evalset == 0:
+                avg_loss = np.mean([self.loss(x, y) for x, y in evalset])
+                print(f"iteration {iteration}, average loss: {avg_loss}")
 
 # PA4 Q6
 def multi_classification():
