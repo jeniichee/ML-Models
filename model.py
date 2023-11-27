@@ -69,7 +69,7 @@ class PolynomialRegressionModel(Model):
         return gradient
 
     def train(self, dataset, evalset = None):
-        np.random.seed(2) 
+        np.random.seed(2) # reproductivity 
         self.weights = np.random.randn(self.degree+1)
         xs, ys = dataset.get_all_samples()
         losses = []
@@ -173,7 +173,7 @@ class BinaryLogisticRegressionModel(Model):
         return (-y*np.log(hx)-(1-y)*np.log(1-hx))
 
     def gradient(self, x, y):
-        # list of partial derivatives of the loss function with respect to each weight.
+        # list of partial derivatives
         hx = self.hypothesis(x) 
         features = self.get_features(x)       
         return (hx-y)*np.array(features) 
@@ -227,28 +227,36 @@ class MultiLogisticRegressionModel(Model):
         self.get_weights()
 
     def hypothesis(self, x):
-        features = self.get_features(x)
-        weights = self.weights.T
-        z = np.dot(features, weights)  # Transpose for matrix multiplication
-        probabilities = np.exp(z) / np.exp(z).sum(axis=1, keepdims=True)
-        return probabilities.tolist()
+       features = self.get_features(x)
+       weights = np.transpose(self.get_weights)
+       z = np.dot(features, weights).sum(axis=1)
+       return np.exp(np.dot(features, weights)) / z.reshape(-1,1)
 
     def predict(self, x):
         return np.argmax(self.hypothesis(x))+1
 
     def loss(self, x, y):
-        probabilities = self.hypothesis(x)
-        return -math.log(probabilities[y - 1]) 
-
-    def gradient(self, x, y):
-        probabilities = self.hypothesis(x)
         features = self.get_features(x)
+        tx = np.dot(features, np.transpose(self.get_weights)) 
+        log_sum = np.log(np.sum(np.exp(np.dot(tx)), axis=1)) 
+        loss = -tx[np.arange(len(y)), y - 1] + log_sum  
+        
+        return np.sum(loss)
+    
+    def gradient(self, x, y):
+        features = self.get_features(x)
+        tx = np.dot(features, np.transpose(self.get_weights()))
+        log_prob = np.exp(tx) / np.sum(np.exp(tx), axis=0)
+        
         gradient = np.zeros_like(self.weights)
-
+        
         for k in range(self.num_classes):
-            gradient[k] = (probabilities[k] - (k + 1 == y)) * np.array(features)
+            if k == y - 1:  
+                gradient[k] = np.sum(features) - np.sum(log_prob * features)
+            else:  
+                gradient[k] = -np.sum(log_prob[k] * features)
 
-        return gradient
+        return gradient.reshape(-1)
 
     def train(self, dataset, evalset = None):
         np.random.seed(2)
